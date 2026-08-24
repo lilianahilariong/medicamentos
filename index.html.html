@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reto FarmaLetras | Profe Liliana Hilarión</title>
+<style>
+  :root{
+    --purple:#5b2ca0; --pink:#ef5da8; --orange:#ff9f43; --green:#2fbf71;
+    --blue:#3b82f6; --ink:#2d2440; --soft:#f7f2ff; --danger:#e5484d;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:Arial,Helvetica,sans-serif;color:var(--ink);
+    background:
+      radial-gradient(circle at 10% 10%,rgba(239,93,168,.12),transparent 25%),
+      radial-gradient(circle at 90% 15%,rgba(59,130,246,.12),transparent 25%),
+      linear-gradient(135deg,#fff,#f8f4ff);min-height:100vh
+  }
+  .app{max-width:1050px;margin:auto;padding:22px}
+  .hero{
+    display:grid;grid-template-columns:1.5fr .8fr;gap:18px;align-items:center;
+    background:#fff;border-radius:24px;padding:22px;box-shadow:0 16px 40px rgba(91,44,160,.12);
+    border:2px solid #eee2ff
+  }
+  .title{margin:0;font-size:clamp(30px,5vw,52px);color:var(--purple);line-height:1}
+  .subtitle{margin:10px 0 0;color:#665d76;font-size:18px}
+  .badge{
+    justify-self:end;background:linear-gradient(135deg,var(--purple),var(--pink));
+    color:#fff;border-radius:22px;padding:18px;text-align:center;min-width:220px
+  }
+  .badge .icon{font-size:44px;display:block;margin-bottom:6px}
+  .panel{margin-top:20px;background:#fff;border-radius:24px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,.07)}
+  .start{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .start-card{padding:18px;border-radius:18px;background:#faf7ff;border:1px solid #eadfff}
+  input{width:100%;padding:13px;border-radius:12px;border:2px solid #dfd1ef;font-size:16px}
+  .startbtn{
+    width:100%;margin-top:12px;padding:14px;border:none;border-radius:13px;
+    background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff;font-weight:900;font-size:17px;cursor:pointer
+  }
+  .topbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+  .pill{background:var(--soft);border:1px solid #e6d7ff;border-radius:999px;padding:9px 13px;font-weight:700}
+  .progress-wrap{height:13px;background:#eee;border-radius:999px;overflow:hidden;margin:18px 0}
+  .progress{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--pink),var(--orange));transition:.3s}
+  .wordbox{background:linear-gradient(135deg,#fbf8ff,#fff);border:2px dashed #d9c3fb;border-radius:20px;padding:20px;text-align:center}
+  .drugname{font-size:14px;color:#756c82;margin-bottom:4px;font-weight:700}
+  .hint{font-size:16px;color:#62596f;margin-bottom:10px}
+  .answer{
+    min-height:64px;border-radius:16px;background:#f5f1fb;border:2px solid #e8ddf6;
+    display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:10px;margin:12px auto;max-width:930px
+  }
+  .slot{
+    width:33px;height:42px;border-radius:9px;background:#fff;border:2px solid #d8c6ef;
+    display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--purple)
+  }
+  .letters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .letter{
+    width:43px;height:48px;border:none;border-radius:12px;background:#fff;
+    box-shadow:0 5px 0 #d7c9ea,0 10px 16px rgba(0,0,0,.08);
+    color:var(--purple);font-size:21px;font-weight:900;cursor:pointer;transition:.12s;user-select:none
+  }
+  .letter:hover{transform:translateY(-2px)}
+  .letter:active{transform:translateY(3px);box-shadow:0 2px 0 #d7c9ea}
+  .letter.used{opacity:.25;pointer-events:none;transform:scale(.9);box-shadow:none}
+  .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+  button.action{border:none;border-radius:13px;padding:12px 18px;font-weight:800;cursor:pointer;font-size:15px}
+  .check{background:var(--green);color:#fff}.undo{background:#f0e8fb;color:var(--purple)}
+  .clear{background:#fff1d8;color:#975a00}.qrbtn{background:var(--purple);color:#fff}
+  .msg{margin:16px auto 0;min-height:52px;max-width:800px;padding:13px 16px;border-radius:14px;font-weight:800;text-align:center;display:flex;align-items:center;justify-content:center}
+  .msg.ok{background:#eafaf1;color:#147a46;border:1px solid #b8eaca}
+  .msg.bad{background:#fff0f1;color:#b4232a;border:1px solid #ffc8cc}
+  .msg.neutral{background:#f6f3fa;color:#675d77;border:1px solid #e8e1f0}
+  .hidden{display:none!important}.final{text-align:center}
+  .scorebig{font-size:64px;font-weight:900;color:var(--purple);margin:8px 0}.stars{font-size:42px;letter-spacing:4px}
+  footer{text-align:center;color:#786f84;margin:22px 0 8px;font-size:14px}
+  .qrmodal{position:fixed;inset:0;background:rgba(31,20,50,.68);display:flex;align-items:center;justify-content:center;padding:18px;z-index:20}
+  .qrcard{background:#fff;border-radius:22px;padding:22px;max-width:370px;width:100%;text-align:center}
+  #qrcode{display:flex;justify-content:center;margin:15px 0}.small{font-size:13px;color:#6c6476}
+  @media(max-width:720px){
+    .hero,.start{grid-template-columns:1fr}.badge{justify-self:stretch}.letter{width:39px;height:44px;font-size:19px}.slot{width:29px;height:38px;font-size:18px}
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <div>
+      <h1 class="title">💊 Reto FarmaLetras</h1>
+      <p class="subtitle">Ordena las letras y descubre los 12 fármacos del reto.</p>
+    </div>
+    <div class="badge">
+      <span class="icon">🧪</span>
+      <strong>Profe Liliana Hilarión</strong><br>
+      <span style="opacity:.9">Juego interactivo</span>
+    </div>
+  </section>
+
+  <section id="startScreen" class="panel start">
+    <div class="start-card">
+      <h2>🎯 ¿Cómo se juega?</h2>
+      <p>Haz clic en las letras para construir correctamente el nombre del medicamento.</p>
+      <p>Son <strong>12 rondas</strong>. Si te equivocas, puedes volver a intentarlo.</p>
+      <p>La puntuación final se calcula sobre <strong>100 puntos</strong>.</p>
+    </div>
+    <div class="start-card">
+      <h2>👩‍⚕️ Identifícate</h2>
+      <label><strong>Nombre del estudiante</strong></label>
+      <input id="student" placeholder="Ej. Laura Pérez" maxlength="40">
+      <button class="startbtn" onclick="startGame()">Comenzar reto 🚀</button>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="panel hidden">
+    <div class="topbar">
+      <div class="pill">👤 <span id="playerName"></span></div>
+      <div class="pill">💎 Aciertos: <span id="hits">0</span></div>
+      <div class="pill">⏱️ Tiempo: <span id="timer">00:00</span></div>
+      <div class="pill">📍 <span id="roundLabel">1/12</span></div>
+    </div>
+    <div class="progress-wrap"><div id="progress" class="progress"></div></div>
+
+    <div class="wordbox">
+      <div class="drugname">Pista farmacológica</div>
+      <div id="hint" class="hint"></div>
+      <div id="answer" class="answer"></div>
+      <div id="letters" class="letters"></div>
+
+      <div class="controls">
+        <button class="action undo" onclick="undoLetter()">↩️ Deshacer</button>
+        <button class="action clear" onclick="clearAnswer()">🧹 Limpiar</button>
+        <button class="action check" onclick="checkAnswer()">✅ Comprobar</button>
+        <button class="action qrbtn" onclick="openQR()">📱 Compartir por QR</button>
+      </div>
+      <div id="message" class="msg neutral">Ordena las letras para comenzar.</div>
+    </div>
+  </section>
+
+  <section id="finalScreen" class="panel final hidden">
+    <h2>🏁 Reto terminado</h2>
+    <p id="finalName"></p>
+    <div id="stars" class="stars">⭐⭐⭐</div>
+    <div id="finalScore" class="scorebig">0/100</div>
+    <p id="finalText"></p>
+    <div class="controls">
+      <button class="action check" onclick="restartGame()">🔁 Jugar de nuevo</button>
+      <button class="action qrbtn" onclick="openQR()">📱 Mostrar QR</button>
+    </div>
+  </section>
+
+  <footer>Profe Liliana Hilarión · Juego educativo de farmacología</footer>
+</div>
+
+<div id="qrModal" class="qrmodal hidden" onclick="if(event.target.id==='qrModal') closeQR()">
+  <div class="qrcard">
+    <h3>📱 Comparte el juego</h3>
+    <div id="qrcode"></div>
+    <p id="qrText" class="small"></p>
+    <button class="action undo" onclick="closeQR()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+const medicines = [
+  {display:"Acetaminofén", answer:"ACETAMINOFEN", hint:"💊 Analgésico y antipirético de uso frecuente. Si esta no sale, el dolor de cabeza va a ser mío 😌"},
+  {display:"Isoniazida", answer:"ISONIAZIDA", hint:"🫁 Clásico contra la tuberculosis. Empieza con “Iso…”. Si ya miraste al techo buscando inspiración, vas regular 😏"},
+  {display:"Glucantime", answer:"GLUCANTIME", hint:"🦟 Antimonial usado contra la leishmaniasis. Suena a superhéroe farmacéutico… pero no, toca estudiarlo 😎"},
+  {display:"Nifurtimox", answer:"NIFURTIMOX", hint:"🪲 Antiparasitario usado en Chagas. Tiene una X al final; si la pusiste donde no era, el medicamento no tiene la culpa 😂"},
+  {display:"Clofazimina", answer:"CLOFAZIMINA", hint:"🧫 Antimicrobiano usado, entre otros, en lepra. Tiene muchas letras y cero compasión con quien no repasó 😈"},
+  {display:"Artesunato", answer:"ARTESUNATO", hint:"🦟 Antipalúdico clave en malaria grave. No es “arte” ni “sudado”: concéntrate, futuro/a experto/a 😄"},
+  {display:"Arteméter + Lumefantrina", answer:"ARTEMETERLUMEFANTRINA", hint:"🦟 Pareja famosa contra la malaria: uno empieza por Arte… y el otro por Lume…. Más larga que una excusa para no estudiar 😅"},
+  {display:"Cloroquina", answer:"CLOROQUINA", hint:"🦟 Antipalúdico clásico. Empieza por “Cloro…”, pero por favor no inventes “cloroxina” que eso ya sería otro laboratorio 😂"},
+  {display:"Primaquina", answer:"PRIMAQUINA", hint:"🦟 Ayuda a eliminar formas hepáticas de algunos Plasmodium. Es “prima” de nombre… pero no te va a soplar la respuesta 😜"},
+  {display:"Quinina", answer:"QUININA", hint:"🦟 Antipalúdico histórico y cortico de nombre. Si aquí te enredas, necesito hablar seriamente con tus neuronas 😌"},
+  {display:"Doxiciclina", answer:"DOXICICLINA", hint:"💊 Tetraciclina con varios usos y también papel en malaria. Empieza por “Doxi…”. No, “doxicilina” no vale: casi es casi 😏"},
+  {display:"Clindamicina", answer:"CLINDAMICINA", hint:"💊 Antibiótico que puede entrar en esquemas combinados. Empieza por “Clinda…”. Si te falta una sílaba, no negociamos puntos 😂"}
+];
+
+let order=[], current=0, selected=[], hits=0, errors=0, startedAt=0, timerInt=null;
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-.5)}
+function shuffleWord(word){
+  let arr=word.split(''), out;
+  do { out=shuffle(arr); } while(out.join('')===word);
+  return out;
+}
+
+function startGame(){
+  const name=document.getElementById('student').value.trim() || "Estudiante";
+  document.getElementById('playerName').textContent=name;
+  order=shuffle(medicines);
+  current=0; selected=[]; hits=0; errors=0; startedAt=Date.now();
+  document.getElementById('hits').textContent=hits;
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('finalScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  clearInterval(timerInt); timerInt=setInterval(updateTimer,1000);
+  loadRound();
+}
+
+function loadRound(){
+  selected=[];
+  const item=order[current];
+  document.getElementById('roundLabel').textContent=(current+1)+"/"+order.length;
+  document.getElementById('progress').style.width=(current/order.length*100)+"%";
+  document.getElementById('hint').textContent=item.hint;
+  document.getElementById('message').className="msg neutral";
+  document.getElementById('message').textContent="Ordena las letras. Puedes hacerlo… eso espero, porque la pista ya hizo bastante trabajo 😄";
+  renderAnswer();
+  const letters=document.getElementById('letters');
+  letters.innerHTML="";
+  shuffleWord(item.answer).forEach((ch,i)=>{
+    const b=document.createElement('button');
+    b.className='letter'; b.textContent=ch; b.dataset.index=i;
+    b.onclick=()=>pickLetter(i,ch,b);
+    letters.appendChild(b);
+  });
+}
+
+function pickLetter(i,ch,btn){
+  if(selected.length>=order[current].answer.length) return;
+  selected.push({i,ch,btn});
+  btn.classList.add('used');
+  renderAnswer();
+}
+
+function renderAnswer(){
+  const answer=document.getElementById('answer');
+  answer.innerHTML="";
+  const len=order[current]?.answer.length || 0;
+  for(let i=0;i<len;i++){
+    const s=document.createElement('div');
+    s.className='slot';
+    s.textContent=selected[i]?.ch || "";
+    answer.appendChild(s);
+  }
+}
+
+function undoLetter(){
+  const last=selected.pop();
+  if(last) last.btn.classList.remove('used');
+  renderAnswer();
+}
+
+function clearAnswer(){
+  selected.forEach(x=>x.btn.classList.remove('used'));
+  selected=[]; renderAnswer();
+}
+
+function checkAnswer(){
+  const item=order[current];
+  if(selected.length!==item.answer.length){
+    showMsg("Aún faltan letras. Ese medicamento quedó a media dosis… y así no lo aprueba ni el comité de milagros 😅",false);
+    return;
+  }
+  const typed=selected.map(x=>x.ch).join('');
+  if(typed===item.answer){
+    hits++;
+    document.getElementById('hits').textContent=hits;
+    showMsg("✅ ¡Correcto! Era "+item.display+".",true);
+    document.querySelectorAll('.letter').forEach(b=>b.disabled=true);
+    setTimeout(()=>{
+      current++;
+      if(current<order.length) loadRound(); else endGame();
+    },1100);
+  } else {
+    errors++;
+    showMsg("❌ Todavía no. Esas letras están haciendo lo que quieren contigo 😏 Reordénalas y vuelve a intentarlo.",false);
+  }
+}
+
+function showMsg(text,ok){
+  const m=document.getElementById('message');
+  m.className="msg "+(ok?"ok":"bad"); m.textContent=text;
+}
+
+function updateTimer(){
+  const sec=Math.floor((Date.now()-startedAt)/1000);
+  const mm=String(Math.floor(sec/60)).padStart(2,'0');
+  const ss=String(sec%60).padStart(2,'0');
+  document.getElementById('timer').textContent=mm+":"+ss;
+}
+
+function endGame(){
+  clearInterval(timerInt);
+  document.getElementById('progress').style.width="100%";
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('finalScreen').classList.remove('hidden');
+
+  const score=Math.max(0,Math.round(100-(errors*4)));
+  const name=document.getElementById('playerName').textContent;
+  document.getElementById('finalName').textContent=name+", completaste los 12 medicamentos.";
+  document.getElementById('finalScore').textContent=score+"/100";
+
+  let stars="", text="";
+  if(score>=92){stars="⭐⭐⭐⭐⭐";text="¡Excelente! Dominaste el reto farmacológico."}
+  else if(score>=80){stars="⭐⭐⭐⭐";text="Muy buen desempeño. Solo faltó una pequeña dosis de precisión."}
+  else if(score>=65){stars="⭐⭐⭐";text="Buen trabajo. Un repaso más y quedas impecable."}
+  else {stars="⭐⭐";text="Hay que repetir la dosis… de estudio 😄";}
+  document.getElementById('stars').textContent=stars;
+  document.getElementById('finalText').textContent=text+" Errores durante el juego: "+errors+".";
+}
+
+function restartGame(){
+  document.getElementById('finalScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+}
+
+function openQR(){
+  const modal=document.getElementById('qrModal');
+  modal.classList.remove('hidden');
+  const box=document.getElementById('qrcode'); box.innerHTML="";
+  const text=document.getElementById('qrText');
+  if(location.protocol==="file:"){
+    text.textContent="Primero publica este archivo HTML en internet. Cuando abras el enlace publicado, este botón generará el QR automáticamente.";
+    box.innerHTML="<div style='font-size:62px'>🌐➡️📱</div>";
+  }else{
+    new QRCode(box,{text:location.href,width:210,height:210});
+    text.textContent="Escanea este QR para abrir el juego.";
+  }
+}
+function closeQR(){document.getElementById('qrModal').classList.add('hidden')}
+</script>
+</body>
+</html>
